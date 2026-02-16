@@ -39,6 +39,9 @@ class Player:
     def next(self):
         if len(self.playlist[0]) == 0: self.__load_playlist_from_programation__()
 
+    def automation_start(self):
+        pass
+
     def __load_playlist_from_programation__(self):
         self.playlist[0] = self.playlist[1][::1]
         self.playlist[1].clear()
