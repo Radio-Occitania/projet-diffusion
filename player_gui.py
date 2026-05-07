@@ -20,7 +20,7 @@ class PlayerGUI:
         """
         self.root = root
         self.root.title("🎙️ Lecteur Radio - Diffusion")
-        self.root.geometry("600x650")
+        self.root.geometry("600x850")
         self.root.resizable(True, False)
         
         # Initialiser la programmation et le lecteur

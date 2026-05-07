@@ -19,7 +19,7 @@ class ProgramationGUI:
         """
         self.root = root
         self.root.title("📻 Programmation Radio")
-        self.root.geometry("800x600")
+        self.root.geometry("800x800")
         self.root.resizable(True, True)
         
         # Initialiser la programmation
