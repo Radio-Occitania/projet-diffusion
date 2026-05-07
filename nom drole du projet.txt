@@ -1,2 +1,22 @@
 nom du panda:
     nook'citania
+
+nom app
+    NookBoard
+    NookMaster
+    NookLive
+    NookPulse
+    OnAir Nook
+    AuraCast
+    AirFlow Studio
+    NookLink
+    StudioNook
+    NookAir
+    Nook'ACast
+    SonoLink
+    RadioCore
+    StudioMatrix
+    Ondea
+    AuraCast
+    AirFlow
+    WaveCast
