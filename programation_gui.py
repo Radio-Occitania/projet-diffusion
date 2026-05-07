@@ -24,8 +24,10 @@ class ProgramationGUI:
         
         # Initialiser la programmation
         self.prog = programation or Programation()
-        self.current_hour_selected = 0
-        
+        self.current_time_selected = 0
+        self.hour_var = tk.StringVar(value="00")
+        self.minute_var = tk.StringVar(value="00")
+
         self._create_widgets()
         self._load_schedule()
 
@@ -65,23 +67,35 @@ class ProgramationGUI:
         )
         reload_button.grid(row=0, column=3, padx=5)
 
-        # Frame pour les heures
-        hours_frame = ttk.LabelFrame(main_frame, text="Sélectionner une heure", padding="10")
+        # Frame pour les horaires
+        hours_frame = ttk.LabelFrame(main_frame, text="Sélectionner un horaire", padding="10")
         hours_frame.pack(fill=tk.X, pady=10)
 
-        self.hours_var = tk.StringVar()
-        hours_combo = ttk.Combobox(
+        ttk.Label(hours_frame, text="Heure:").grid(row=0, column=0, sticky="w")
+        self.hour_spin = tk.Spinbox(
             hours_frame,
-            textvariable=self.hours_var,
-            values=[f"{h:02d}:00" for h in range(24)],
-            state="readonly",
-            width=10
+            from_=0,
+            to=23,
+            textvariable=self.hour_var,
+            width=3,
+            format="%02.0f",
         )
-        hours_combo.grid(row=0, column=0, padx=5)
-        hours_combo.bind("<<ComboboxSelected>>", self._on_hour_selected)
+        self.hour_spin.grid(row=0, column=1, padx=(5, 0))
 
-        ttk.Button(hours_frame, text="➕ Ajouter fichier", command=self._on_add_file).grid(row=0, column=1, padx=5)
-        ttk.Button(hours_frame, text="❌ Effacer l'heure", command=self._on_clear_hour).grid(row=0, column=2, padx=5)
+        ttk.Label(hours_frame, text=":").grid(row=0, column=2)
+        self.minute_spin = tk.Spinbox(
+            hours_frame,
+            from_=0,
+            to=59,
+            textvariable=self.minute_var,
+            width=3,
+            format="%02.0f",
+        )
+        self.minute_spin.grid(row=0, column=3, padx=(0, 5))
+
+        ttk.Button(hours_frame, text="⏱️ Choisir", command=self._on_time_selected).grid(row=0, column=4, padx=5)
+        ttk.Button(hours_frame, text="➕ Ajouter fichier", command=self._on_add_file).grid(row=0, column=5, padx=5)
+        ttk.Button(hours_frame, text="❌ Effacer le créneau", command=self._on_clear_time).grid(row=0, column=6, padx=5)
 
         # Frame pour la liste des fichiers
         files_frame = ttk.LabelFrame(main_frame, text="Fichiers pour l'heure sélectionnée", padding="10")
@@ -160,26 +174,32 @@ class ProgramationGUI:
         self.prog.reload_library()
         messagebox.showinfo("Succès", f"Bibliothèque rechargée: {len(self.prog.media_library)} fichiers trouvés")
 
-    def _on_hour_selected(self, event=None) -> None:
-        """Met à jour la liste des fichiers pour l'heure sélectionnée."""
-        hour_str = self.hours_var.get()
-        if hour_str:
-            self.current_hour_selected = int(hour_str.split(":")[0])
-            self._load_files_for_hour()
+    def _on_time_selected(self) -> None:
+        """Met à jour la liste des fichiers pour l'horaire sélectionné."""
+        try:
+            hour = int(self.hour_var.get())
+            minute = int(self.minute_var.get())
+            if hour < 0 or hour > 23 or minute < 0 or minute > 59:
+                raise ValueError
+        except ValueError:
+            messagebox.showwarning("Attention", "Veuillez entrer un horaire valide (HH:MM)")
+            return
 
-    def _load_files_for_hour(self) -> None:
-        """Charge les fichiers pour l'heure sélectionnée."""
+        self.current_time_selected = hour * 60 + minute
+        self._load_files_for_time()
+
+    def _load_files_for_time(self) -> None:
+        """Charge les fichiers pour l'horaire sélectionné."""
         self.files_tree.delete(*self.files_tree.get_children())
-        
-        sequence = self.prog.get_sequence_for_hour(self.current_hour_selected)
+        sequence = self.prog.get_sequence_for_time(self.current_time_selected)
         for i, file_path in enumerate(sequence, 1):
             path_obj = Path(file_path)
             self.files_tree.insert("", tk.END, text=str(i), values=(path_obj.name, file_path))
 
     def _on_add_file(self) -> None:
-        """Ajoute un fichier à l'heure sélectionnée."""
-        if not self.hours_var.get():
-            messagebox.showwarning("Attention", "Veuillez sélectionner une heure")
+        """Ajoute un fichier à l'horaire sélectionné."""
+        if self.current_time_selected is None:
+            messagebox.showwarning("Attention", "Veuillez sélectionner un horaire")
             return
 
         file_path = filedialog.askopenfilename(
@@ -188,9 +208,10 @@ class ProgramationGUI:
         )
         
         if file_path:
-            sequence = self.prog.get_sequence_for_hour(self.current_hour_selected)
+            sequence = list(self.prog.get_sequence_for_time(self.current_time_selected))
             sequence.append(file_path)
-            self._load_files_for_hour()
+            self.prog.set_sequence_for_time(self.current_time_selected, sequence)
+            self._load_files_for_time()
 
     def _on_remove_file(self) -> None:
         """Supprime le fichier sélectionné."""
@@ -199,13 +220,14 @@ class ProgramationGUI:
             messagebox.showwarning("Attention", "Sélectionnez un fichier à supprimer")
             return
 
-        sequence = self.prog.get_sequence_for_hour(self.current_hour_selected)
+        sequence = list(self.prog.get_sequence_for_time(self.current_time_selected))
         for item in selection:
             index = int(self.files_tree.item(item)["text"]) - 1
             if 0 <= index < len(sequence):
                 sequence.pop(index)
-        
-        self._load_files_for_hour()
+
+        self.prog.set_sequence_for_time(self.current_time_selected, sequence)
+        self._load_files_for_time()
 
     def _on_move_up(self) -> None:
         """Remonte le fichier sélectionné."""
@@ -218,9 +240,10 @@ class ProgramationGUI:
         index = int(self.files_tree.item(item)["text"]) - 1
         
         if index > 0:
-            sequence = self.prog.get_sequence_for_hour(self.current_hour_selected)
+            sequence = list(self.prog.get_sequence_for_time(self.current_time_selected))
             sequence[index], sequence[index - 1] = sequence[index - 1], sequence[index]
-            self._load_files_for_hour()
+            self.prog.set_sequence_for_time(self.current_time_selected, sequence)
+            self._load_files_for_time()
 
     def _on_move_down(self) -> None:
         """Descend le fichier sélectionné."""
@@ -231,27 +254,27 @@ class ProgramationGUI:
 
         item = selection[0]
         index = int(self.files_tree.item(item)["text"]) - 1
-        sequence = self.prog.get_sequence_for_hour(self.current_hour_selected)
+        sequence = list(self.prog.get_sequence_for_time(self.current_time_selected))
         
         if index < len(sequence) - 1:
             sequence[index], sequence[index + 1] = sequence[index + 1], sequence[index]
-            self._load_files_for_hour()
+            self.prog.set_sequence_for_time(self.current_time_selected, sequence)
+            self._load_files_for_time()
 
-    def _on_clear_hour(self) -> None:
-        """Efface tous les fichiers de l'heure sélectionnée."""
-        if not self.hours_var.get():
-            messagebox.showwarning("Attention", "Veuillez sélectionner une heure")
+    def _on_clear_time(self) -> None:
+        """Efface tous les fichiers de l'horaire sélectionné."""
+        if self.current_time_selected is None:
+            messagebox.showwarning("Attention", "Veuillez sélectionner un horaire")
             return
 
-        if messagebox.askyesno("Confirmation", "Êtes-vous sûr de vouloir effacer cette heure?"):
-            if self.current_hour_selected in self.prog.daily_schedule:
-                self.prog.daily_schedule[self.current_hour_selected] = []
-            self._load_files_for_hour()
+        if messagebox.askyesno("Confirmation", "Êtes-vous sûr de vouloir effacer ce créneau?"):
+            self.prog.set_sequence_for_time(self.current_time_selected, [])
+            self._load_files_for_time()
 
     def _on_save(self) -> None:
         """Enregistre la programmation."""
         try:
-            self.prog._save_to_db()
+            self.prog.save_schedule()
             messagebox.showinfo("Succès", "Programmation enregistrée avec succès")
         except Exception as e:
             messagebox.showerror("Erreur", f"Erreur lors de l'enregistrement: {e}")
@@ -265,10 +288,9 @@ Dossier: {self.prog.source_folder}
 
 Programmation horaire:
 """
-        for hour in range(24):
-            seq = self.prog.get_sequence_for_hour(hour)
-            if seq:
-                stats += f"\n{hour:02d}:00 → {len(seq)} fichier(s)"
+        for minute in sorted(self.prog.daily_schedule.keys()):
+            seq = self.prog.daily_schedule[minute]
+            stats += f"\n{self.prog._format_time_key(minute)} → {len(seq)} fichier(s)"
 
         messagebox.showinfo("Statistiques", stats)
 
@@ -284,7 +306,14 @@ Programmation horaire:
 
     def _load_schedule(self) -> None:
         """Charge la programmation initiale."""
-        pass
+        if self.prog.daily_schedule:
+            first_time = sorted(self.prog.daily_schedule)[0]
+        else:
+            first_time = 0
+        self.current_time_selected = first_time
+        self.hour_var.set(f"{first_time // 60:02d}")
+        self.minute_var.set(f"{first_time % 60:02d}")
+        self._load_files_for_time()
 
     def run(self) -> None:
         """Lance l'interface graphique."""

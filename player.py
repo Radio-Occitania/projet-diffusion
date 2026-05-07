@@ -127,6 +127,9 @@ class Player:
                 break
             time.sleep(0.2)
 
+    def automation_start(self) -> None:
+        self.start()
+
     def get_current_title(self) -> str:
         """Retourne le titre du fichier en cours de lecture."""
         media = self.player.get_media()

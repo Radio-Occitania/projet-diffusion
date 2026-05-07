@@ -1,7 +1,8 @@
 """Interface graphique pour le lecteur audio."""
 
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, filedialog, messagebox
+from pathlib import Path
 from typing import Optional
 from player import Player
 from programation import Programation
@@ -19,7 +20,7 @@ class PlayerGUI:
         """
         self.root = root
         self.root.title("🎙️ Lecteur Radio - Diffusion")
-        self.root.geometry("600x500")
+        self.root.geometry("600x650")
         self.root.resizable(True, False)
         
         # Initialiser la programmation et le lecteur
@@ -59,6 +60,10 @@ class PlayerGUI:
         ttk.Label(status_frame, text="Temps restant:", font=("Arial", 10, "bold")).grid(row=2, column=0, sticky="w", pady=(10, 0))
         self.time_var = tk.StringVar(value="0s")
         ttk.Label(status_frame, textvariable=self.time_var, foreground="orange").grid(row=2, column=1, sticky="w", padx=10, pady=(10, 0))
+
+        ttk.Label(status_frame, text="Prochaine séquence:", font=("Arial", 10, "bold")).grid(row=3, column=0, sticky="nw", pady=(10, 0))
+        self.next_sequence_var = tk.StringVar(value="Aucune séquence")
+        ttk.Label(status_frame, textvariable=self.next_sequence_var, wraplength=420, justify="left").grid(row=3, column=1, sticky="w", padx=10, pady=(10, 0))
 
         # Frame pour les buffers
         buffer_frame = ttk.LabelFrame(main_frame, text="État des buffers", padding="10")
@@ -101,9 +106,20 @@ class PlayerGUI:
         )
         self.next_button.grid(row=0, column=2, padx=5, pady=5)
 
+        self.force_button = ttk.Button(
+            control_frame,
+            text="🔥 Forcer séquence",
+            command=self._on_force_sequence,
+            width=15
+        )
+        self.force_button.grid(row=0, column=3, padx=5, pady=5)
+
         # Frame pour le volume
         volume_frame = ttk.LabelFrame(main_frame, text="Volume", padding="10")
         volume_frame.pack(fill=tk.X, pady=10)
+
+        self.volume_label = ttk.Label(volume_frame, text="100%", width=5)
+        self.volume_label.pack(side=tk.RIGHT, padx=10)
 
         self.volume_slider = ttk.Scale(
             volume_frame,
@@ -113,11 +129,8 @@ class PlayerGUI:
             command=self._on_volume_change,
             length=300
         )
-        self.volume_slider.set(100)
         self.volume_slider.pack(side=tk.LEFT, padx=5)
-
-        self.volume_label = ttk.Label(volume_frame, text="100%", width=5)
-        self.volume_label.pack(side=tk.LEFT, padx=10)
+        self.volume_slider.set(100)
 
         # Frame pour les informations
         info_frame = ttk.LabelFrame(main_frame, text="Informations", padding="10")
@@ -167,6 +180,19 @@ class PlayerGUI:
         self.player.player.audio_set_volume(volume)
         self.volume_label.config(text=f"{volume}%")
 
+    def _on_force_sequence(self) -> None:
+        """Force la lecture d'une séquence choisie par l'utilisateur."""
+        files = filedialog.askopenfilenames(
+            title="Sélectionner les fichiers à forcer",
+            filetypes=[("Fichiers audio", "*.mp3 *.wav *.flac *.ogg *.m4a"), ("Tous", "*")]
+        )
+        if files:
+            try:
+                self.player.force_next_sequence(list(files))
+                self._add_info(f"🔥 Séquence forcée avec {len(files)} fichier(s)")
+            except Exception as e:
+                messagebox.showerror("Erreur", f"Impossible de forcer la séquence: {e}")
+
     def _add_info(self, message: str) -> None:
         """Ajoute un message aux informations."""
         self.info_text.config(state=tk.NORMAL)
@@ -184,6 +210,14 @@ class PlayerGUI:
             # Mise à jour du titre suivant
             next_title = self.player.get_next_title()
             self.next_title_var.set(next_title or "Aucun")
+
+            # Mise à jour de la prochaine séquence
+            next_sequence = self.player.get_next_sequence()
+            if next_sequence:
+                next_sequence_names = [Path(path).name for path in next_sequence]
+                self.next_sequence_var.set(" → ".join(next_sequence_names))
+            else:
+                self.next_sequence_var.set("Aucune séquence")
 
             # Mise à jour du temps restant
             remaining = self.player.get_remaining_time()
