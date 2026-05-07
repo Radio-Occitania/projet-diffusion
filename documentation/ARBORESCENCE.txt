@@ -1,0 +1,189 @@
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                   📻 STRUCTURE DU PROJET RADIO                             ║
+║                      Système de Diffusion Automatisé                       ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+📅 Date: 07 May 2026 à 11:34
+
+═══════════════════════════════════════════════════════════════════════════════
+                            🗂️  ARBORESCENCE
+═══════════════════════════════════════════════════════════════════════════════
+
+📁 projet-diffusion/
+├── 📂 audio_example/
+│   ├── 📂 Top_Horaire/
+│   │   ├── 🎵 TOP_HORAIRE_00h00.mp3 (85.6 KB)
+│   │   ├── 🎵 TOP_HORAIRE_01h00.mp3 (82.4 KB)
+│   │   ├── 🎵 TOP_HORAIRE_02h00.mp3 (82.7 KB)
+│   │   ├── 🎵 TOP_HORAIRE_03h00.mp3 (82.3 KB)
+│   │   ├── 🎵 TOP_HORAIRE_04h00.mp3 (82.7 KB)
+│   │   ├── 🎵 TOP_HORAIRE_05h00.mp3 (101.6 KB)
+│   │   ├── 🎵 TOP_HORAIRE_06h00.mp3 (121.1 KB)
+│   │   ├── 🎵 TOP_HORAIRE_07h00.mp3 (161.9 KB)
+│   │   ├── 🎵 TOP_HORAIRE_08h00.mp3 (101.1 KB)
+│   │   ├── 🎵 TOP_HORAIRE_09h00.mp3 (101.6 KB)
+│   │   ├── 🎵 TOP_HORAIRE_10h00.mp3 (102.1 KB)
+│   │   ├── 🎵 TOP_HORAIRE_11h00.mp3 (101.6 KB)
+│   │   └── 🎵 TOP_HORAIRE_12h00.mp3 (82.3 KB)
+│   ├── 🎵 Assassins Creed 2 OST Jesper Kyd - Ezios Family (Track 03).mp3 (5.5 MB)
+│   ├── 🎵 Caravan Palace - Good Mouse (Official Video) MOUSE P.I. For Hire Original Game Soundtrack.mp3 (3.5 MB)
+│   ├── 🎵 Maiden Voyage Full Band (8-man) Sea of Thieves Shanties All Instruments & Every Lead.mp3 (2.9 MB)
+│   ├── 🎵 Outer Wilds OST - Travelers (All Instruments Join).mp3 (5.8 MB)
+│   └── 🎵 PULPITO en MEXICO Mix7 by RESH.G-2011459427.mp3 (57.1 MB)
+├── 📂 documentation/
+│   ├── 📕 Documentation - Lecteur Radio et Programmation.pdf (1.7 MB)
+│   └── 📄 documentation.txt (7.0 KB)
+├── 📂 utilities/
+│   └── 🐍 logger.py (2.4 KB)
+├── 📄 ARBORESCENCE.txt (11.9 KB)
+├── 🐍 interfaces.py (2.6 KB)
+├── 🐍 main.py (0.0 B)
+├── 📄 nom drole du projet.txt (289.0 B)
+├── 🐍 player.py (5.5 KB)
+├── 🐍 player_gui.py (9.7 KB)
+├── 🐍 programation.py (8.3 KB)
+├── 🐍 programation_gui.py (12.1 KB)
+└── 📄 requirements.txt (18.0 B)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                          📊 STATISTIQUES
+═══════════════════════════════════════════════════════════════════════════════
+
+  📦 Modules principaux:
+     ├─ programation.py: 🎯 Gestion programmation
+     ├─ player.py: 🎵 Lecteur audio
+     ├─ player_gui.py: 🖥️  Interface lecteur
+     ├─ programation_gui.py: 🖥️  Interface programmation
+     └─ interfaces.py: 🔧 Interfaces abstraites
+     
+
+═══════════════════════════════════════════════════════════════════════════════
+                        📋 DESCRIPTION DES MODULES
+═══════════════════════════════════════════════════════════════════════════════
+
+🐍 FICHIERS PYTHON
+
+  📄 main.py
+     └─ Point d'entrée principal du projet
+     └─ À compléter selon les besoins
+
+  📄 programation.py (8.5 KB)
+     └─ Classe Programation
+     └─ Gestion de la programmation horaire
+     └─ Persistance SQLite
+     └─ Gestion de la bibliothèque audio
+
+  📄 player.py (5.6 KB)
+     └─ Classe Player
+     └─ Lecteur audio avec buffers
+     └─ Gestion multi-thread
+     └─ Intégration VLC
+
+  📄 interfaces.py (2.6 KB)
+     └─ Interfaces abstraites (ABC)
+     └─ PlayerInterface
+     └─ ProgramationInterface
+
+  📄 player_gui.py (9.9 KB)
+     └─ Interface graphique du lecteur
+     └─ Contrôle de lecture en temps réel
+     └─ Monitoring des buffers
+     └─ Gestion du volume
+
+  📄 programation_gui.py (12.4 KB)
+     └─ Interface graphique de programmation
+     └─ Gestion de la grille horaire
+     └─ Gestion des fichiers audio
+     └─ Sauvegarde de la programmation
+
+📁 DOSSIERS
+
+  📂 utilities/
+     └─ logger.py
+        └─ Utilitaires de logging
+
+  📂 .git/
+     └─ Repository Git
+     └─ Historique des commits
+
+═══════════════════════════════════════════════════════════════════════════════
+                      🔐 FICHIERS DE CONFIGURATION
+═══════════════════════════════════════════════════════════════════════════════
+
+  requirements.txt
+  ├─ python-vlc: Lecture audio VLC
+  └─ librosa: Validation des fichiers audio
+  
+
+  .gitignore
+  ├─ __pycache__
+  ├─ .venv
+  ├─ *.pyc
+  └─ programation.db
+
+═══════════════════════════════════════════════════════════════════════════════
+                        💡 ARCHITECTURE GLOBALE
+═══════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         SYSTÈME DE DIFFUSION RADIO                      │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                    ┌───────────────┼───────────────┐
+                    │               │               │
+            ┌───────▼────────┐  ┌──▼──────────┐  ┌─▼─────────────┐
+            │ Programation   │  │   Player    │  │  Interfaces   │
+            │                │  │             │  │  (ABC)        │
+            ├────────────────┤  ├─────────────┤  ├───────────────┤
+            │ • Gestion DB   │  │ • Buffers   │  │ • PlayerI.    │
+            │ • Horaires     │  │ • Threads   │  │ • ProgramationI│
+            │ • Fichiers     │  │ • VLC       │  └───────────────┘
+            └───────┬────────┘  └──┬──────────┘
+                    │              │
+                    └──────────────┬─────────────────────┐
+                                   │                     │
+                        ┌──────────▼─────────┐  ┌────────▼──────────┐
+                        │   PlayerGUI        │  │  ProgramationGUI  │
+                        │                    │  │                   │
+                        ├────────────────────┤  ├───────────────────┤
+                        │ • Interface Tkinter│  │ • Interface Tkinter
+                        │ • Contrôle lecture │  │ • Gestion horaires
+                        │ • Monitoring       │  │ • Gestion fichiers
+                        └────────────────────┘  └───────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+                      ⚙️  DÉPENDANCES ET VERSIONS
+═══════════════════════════════════════════════════════════════════════════════
+
+CORE:
+  • Python 3.8+
+  • SQLite 3
+  • Tkinter (intégré)
+
+EXTERNAL:
+  • python-vlc: Lecture et contrôle audio
+  • librosa: Validation et analyse audio
+
+═══════════════════════════════════════════════════════════════════════════════
+                        🚀 UTILISATION DU PROJET
+═══════════════════════════════════════════════════════════════════════════════
+
+1️⃣  INTERFACE DE PROGRAMMATION
+    $ python programation_gui.py
+    └─ Gérer la grille horaire et les fichiers
+
+2️⃣  INTERFACE DE LECTEUR
+    $ python player_gui.py
+    └─ Contrôler la diffusion radio
+
+3️⃣  SCRIPT PERSONNALISÉ
+    from programation import Programation
+    from player import Player
+    
+    prog = Programation()
+    player = Player(prog)
+    player.start()
+
+═══════════════════════════════════════════════════════════════════════════════
